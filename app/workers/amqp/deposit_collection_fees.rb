@@ -14,7 +14,7 @@ module Workers
         end
 
         deposit.with_lock do
-          if deposit.collected?
+          if deposit.processing?
             Rails.logger.warn { "The deposit is now being processed by different worker or has been already processed. Skipping..." }
             return
           end

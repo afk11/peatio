@@ -51,18 +51,18 @@ class Account < ApplicationRecord
     end
   end
 
-  def plus_funds!(amount)
-    update_columns((attributes_after_plus_funds!(amount)))
+  def plus_funds!(amount, kind)
+    update_columns((attributes_after_plus_funds!(amount, kind)))
   end
 
-  def plus_funds(amount)
-    with_lock { plus_funds!(amount) }
+  def plus_funds(amount, kind = :balance)
+    with_lock { plus_funds!(amount, kind) }
     self
   end
 
-  def attributes_after_plus_funds!(amount)
+  def attributes_after_plus_funds!(amount, kind)
     raise AccountError, "Cannot add funds (account id: #{id}, amount: #{amount}, balance: #{balance})." if amount <= ZERO
-    { balance: balance + amount }
+    { kind => balance + amount }
   end
 
   def sub_funds!(amount)
