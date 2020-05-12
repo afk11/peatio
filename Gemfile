@@ -6,6 +6,7 @@ git_source(:github) { |repo_slug| "https://github.com/#{repo_slug}" }
 
 ruby '2.6.5'
 
+gem 'bip44', '~> 0.2.18'
 gem 'ransack', '~> 2.1.1'
 gem 'rails', '~> 5.2.3'
 gem 'puma', '~> 3.12.0'

@@ -235,6 +235,17 @@ ActiveRecord::Schema.define(version: 2019_09_23_085927) do
     t.index ["updated_at"], name: "index_orders_on_updated_at"
   end
 
+  create_table "payment_address_info", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.integer "account_id", null: false
+    t.string "address", limit: 95, null: false
+    t.string "uid", limit: 50, null: false
+    t.string "path", null: false
+    t.string "currency_id", limit: 10, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address"], name: "index_payment_address_info_on_address"
+  end
+
   create_table "payment_addresses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "currency_id", limit: 10, null: false
     t.integer "account_id", null: false

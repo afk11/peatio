@@ -70,6 +70,7 @@ namespace :seed do
     Wallet.transaction do
       YAML.load_file(Rails.root.join('config/seed/wallets.yml')).each do |hash|
         next if Wallet.exists?(name: hash.fetch('name'))
+        print hash
         Wallet.create!(hash)
       end
     end
