@@ -25,14 +25,42 @@ module Ethereum
     end
 
     def create_address!(options = {})
-      account_node = MoneyTree::Node.from_bip32("tprv8fi9AsXEw28TdfV4gucb29pLYJyFUBvds82sW1Vp2DtHVP7wxzzoYsVX6eSYjvPABDAdsPh3nkvJP9Sn7KyBL5mKf4zceZmqQwSLHLTZ4rf")
-      addr_node = account_node.node_for_path("0/0")
+      print "options.uid %s\n" % options[:uid]
+      print "currency.id %s\n" % @currency[:id]
+      member = Member.find_by(uid: options[:uid])
+      account = Account.find_by(member_id: member.id)
+      print "member: #{member.id}"
+      print "\n"
+      print "account: #{account.id}"
+      print "\n"
+      accounts = {
+        "eth" => {
+          xpub: "tprv8fi9AsXEw28TdfV4gucb29pLYJyFUBvds82sW1Vp2DtHVP7wxzzoYsVX6eSYjvPABDAdsPh3nkvJP9Sn7KyBL5mKf4zceZmqQwSLHLTZ4rf",
+          path: "M/44'/0'/0'/0'",
+        },
+        "usdt" => {
+          xpub: "tprv8fi9AsXEw28TdfV4gucb29pLYJyFUBvds82sW1Vp2DtHVP7wxzzoYsVX6eSYjvPABDAdsPh3nkvJP9Sn7KyBL5mKf4zceZmqQwSLHLTZ4rf",
+          path: "M/44'/0'/0'/0'",
+        }
+      }
+      deriv_number = PaymentAddressInfo.
+      print "use key %s \n" % accounts[@currency[:id]]
+      print "derivation number %d\n" % deriv_number
+      account_node = MoneyTree::Node.from_bip32(accounts[@currency[:id]][:xpub])
+      full_path = accounts[@currency[:id]][:xpub]+"0/#{deriv_number}"
+      print "full path: %s\n" % full_path
+      addr_node = account_node.node_for_path("0/#{deriv_number}")
       addr_wallet = Bip44::Wallet.new(addr_node)
       eth_privkey = addr_wallet.private_key
-      secret = @wallet[:secret]
+      addr_info = PaymentAddressInfo.create(uid: options[:uid], path:full_path,currency: @currency[:id], account: account[:id])
+      addr_info.save!
 
-      { address: client.json_rpc(:personal_importRawKey, [eth_privkey,  secret]),
-        secret:  password }
+      secret = options.fetch(:secret) { PasswordGenerator.generate(64) }
+      secret.yield_self do |password|
+        { address: normalize_address(client.json_rpc(:personal_importRawKey, [eth_privkey,  password])),
+          secret:  password }
+
+      end
     end
 
     def create_transaction!(transaction, options = {})

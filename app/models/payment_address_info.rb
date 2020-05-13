@@ -1,7 +1,8 @@
 class PaymentAddressInfo < ApplicationRecord
+  self.table_name = "payment_address_info"
+
   include BelongsToCurrency
   include BelongsToAccount
-
 end
 
 # == Schema Information
